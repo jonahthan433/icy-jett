@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "icy-jett",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "ai": { "binding": "AI" },
+  "vars": {
+    // What your agent does: the system prompt for every paid question.
+    "AGENT_PROMPT": "Bitcoin and Stacks technical explainer - answers questions about sBTC, Stacks, Clarity contracts, and Bitcoin L1/L2   architecture",
+    // Any Workers AI text-generation model: https://developers.cloudflare.com/workers-ai/models/
+    "AI_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+    // Price per question, in the token's smallest unit (sats for sBTC, microSTX for STX).
+    "PRICE": "10",
+    "TOKEN": "sBTC",
+    "STACKS_NETWORK": "mainnet",
+    // Address that receives payments for /ask and the paid MCP tool.
+    "PAY_TO": "SPV9XWS0K9H29X4BFZ0BT8P6MQR38FAE0GVRYHRK",
+    "MAX_SATS_PER_PAYMENT": "10000"
+  },
+  // Secrets (wrangler secret put / .dev.vars):
+  //   WALLET_KEK         32 random bytes, base64. Encrypts each agent's key.
+  //   PAYER_PRIVATE_KEY  optional, dev only: pay from a funded wallet instead.
+  "durable_objects": {
+    "bindings": [
+      { "class_name": "PaidMCP", "name": "PaidMCP" },
+      { "class_name": "StacksAgent", "name": "StacksAgent" }
+    ]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["PaidMCP", "StacksAgent"] }]
+}
